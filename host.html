@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Host — PH History Buzzer</title>
+<title>Host — Sprint Retro Buzzer</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
 <style>
@@ -39,35 +39,25 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .ql{font-size:13px;color:var(--muted);white-space:nowrap;}
 .prog{flex:1;height:3px;background:var(--surface2);border-radius:99px;overflow:hidden;}
 .prog-f{height:100%;background:var(--accent);border-radius:99px;transition:width 0.4s;}
-.tmr{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--accent);line-height:1;min-width:48px;text-align:right;}
-.tmr.urgent{color:var(--red);animation:urg 0.5s infinite;}
-@keyframes urg{0%,100%{opacity:1}50%{opacity:0.3}}
 
 .gg{display:grid;grid-template-columns:1fr 360px;gap:16px;max-width:1200px;margin:0 auto;width:100%;}
-.qcard{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:1.75rem 2rem;margin-bottom:12px;}
-.qcat{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
-.qtxt{font-size:clamp(19px,2.4vw,26px);font-weight:500;line-height:1.45;}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.ch{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--text);display:flex;align-items:center;gap:12px;}
-.chl{width:30px;height:30px;border-radius:7px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--muted);flex-shrink:0;}
-.ch.correct{border-color:var(--green);background:rgba(62,207,114,0.08);}
-.ch.correct .chl{background:var(--green);color:#fff;}
-.fact{background:var(--surface);border-left:3px solid var(--accent);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--muted);line-height:1.6;display:none;margin-bottom:12px;}
-.fact.show{display:block;}
-.fact b{color:var(--accent);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:4px;}
-.ar{display:flex;gap:10px;}
-.br{background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);border-radius:10px;padding:12px 24px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;display:none;}
-.br.show{display:inline-block;}
-.br:hover{border-color:var(--accent);}
-.bn{background:var(--accent);color:#111;border:none;border-radius:10px;padding:12px 24px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;display:none;}
-.bn.show{display:inline-block;}
+.qcard{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:2rem 2.5rem;margin-bottom:12px;}
+.qnum{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.qtxt{font-size:clamp(22px,3vw,32px);font-weight:500;line-height:1.45;}
+.hint-tag{display:inline-block;margin-top:12px;background:var(--surface2);border-radius:99px;padding:4px 14px;font-size:12px;color:var(--muted);}
+
+.ar{display:flex;gap:10px;margin-top:4px;}
+.bn{background:var(--accent);color:#111;border:none;border-radius:10px;padding:12px 28px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;transition:opacity 0.15s;}
+.bn:hover{opacity:0.88;}
+.bn.outline{background:transparent;color:var(--text);border:0.5px solid var(--border2);}
+.bn.outline:hover{border-color:var(--accent);}
 
 .rc{display:flex;flex-direction:column;gap:12px;}
 .panel{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:1.25rem;}
 .pt{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
 .bzlist{display:flex;flex-direction:column;gap:8px;min-height:80px;}
 .bzi{display:flex;align-items:center;gap:10px;background:var(--surface2);border:0.5px solid var(--border);border-radius:10px;padding:10px 12px;animation:pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
-.bzr{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:30px;}
+.bzr{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:38px;}
 .bzr.r1{color:#f5c842;}.bzr.r2{color:#b0b0b0;}.bzr.r3{color:#cd7f32;}
 .bze{font-size:13px;color:var(--muted2);font-style:italic;text-align:center;padding:1rem 0;}
 .pr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);}
@@ -77,17 +67,13 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 #results{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:radial-gradient(ellipse at 50% 30%,#101e18 0%,#080810 65%);}
 .rt{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,96px);text-align:center;line-height:1;margin-bottom:6px;}
 .rs{font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2.5rem;}
-.pod{display:flex;align-items:flex-end;justify-content:center;gap:16px;margin-bottom:2rem;}
-.pc{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:1.25rem 1.5rem 0;min-width:140px;}
-.pc.p1{border-color:rgba(245,200,66,0.4);padding-bottom:2.5rem;}
-.pc.p2{padding-bottom:1.5rem;}.pc.p3{padding-bottom:0.75rem;opacity:0.85;}
-.pm{font-size:36px;}
-.ar2{width:100%;max-width:500px;display:flex;flex-direction:column;gap:8px;margin-bottom:2rem;}
-.rrow{display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:12px 16px;}
-.rrk{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);min-width:28px;}
-.rrbw{flex:2;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;}
-.rrb{height:100%;background:var(--accent);border-radius:99px;transition:width 0.9s ease 0.3s;}
-.rrp{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);min-width:50px;text-align:right;}
+.final-wrap{width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px;margin-bottom:2rem;}
+.final-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px 18px;}
+.fr-rank{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--muted);min-width:32px;}
+.fr-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
+.fr-name{flex:1;font-size:15px;font-weight:500;}
+.fr-pts{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);}
+.fr-label{font-size:11px;color:var(--muted);margin-left:2px;}
 .bo{background:transparent;color:var(--text);border:1.5px solid var(--border2);border-radius:10px;padding:12px 28px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;}
 .bo:hover{border-color:var(--accent);}
 
@@ -99,8 +85,8 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 <div class="toast" id="toast"></div>
 
 <div id="setup" class="screen active">
-  <div class="logo">PH HISTORY<br><span>BUZZER</span></div>
-  <p class="sub">Sprint Retro Icebreaker · Host View</p>
+  <div class="logo">SPRINT RETRO<br><span>BUZZER</span></div>
+  <p class="sub">Icebreaker Game · Host View</p>
   <div class="card">
     <label class="lbl">Session Code</label>
     <input class="inp" id="sinp" placeholder="e.g. sprint86" value="sprint86" maxlength="20">
@@ -120,27 +106,27 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 
 <div id="game" class="screen">
   <div class="gh">
-    <span class="ql" id="qlbl">Q 1 / 10</span>
+    <span class="ql" id="qlbl">Q 1 / 15</span>
     <div class="prog"><div class="prog-f" id="pgf"></div></div>
-    <div class="tmr" id="tmr">15</div>
+    <span style="font-size:13px;color:var(--muted);" id="qcount">1/15</span>
   </div>
   <div class="gg">
     <div>
       <div class="qcard">
-        <div class="qcat" id="qcat"></div>
+        <div class="qnum" id="qnum">QUESTION 1</div>
         <div class="qtxt" id="qtxt"></div>
+        <div class="hint-tag" id="qhint" style="display:none;"></div>
       </div>
-      <div class="choices" id="choices"></div>
-      <div class="fact" id="fact"><b>Fun Fact</b><span id="ftxt"></span></div>
       <div class="ar">
-        <button class="br" id="brev" onclick="revealAnswer()">REVEAL ANSWER</button>
-        <button class="bn" id="bnxt" onclick="nextQuestion()">NEXT →</button>
+        <button class="bn outline" onclick="prevQ()" id="bprev" style="display:none;">← PREV</button>
+        <button class="bn" id="bnxt" onclick="nextQuestion()">NEXT QUESTION →</button>
       </div>
     </div>
     <div class="rc">
       <div class="panel">
         <div class="pt">Buzz Order 🔔</div>
         <div class="bzlist" id="bzlist"><div class="bze">Waiting for buzzes...</div></div>
+        <button onclick="clearBuzz()" style="margin-top:10px;background:none;border:0.5px solid var(--border2);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;width:100%;">Clear Buzzes</button>
       </div>
       <div class="panel">
         <div class="pt">Players Online</div>
@@ -151,32 +137,37 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 </div>
 
 <div id="results" class="screen">
-  <div class="rt">GAME OVER!</div>
-  <p class="rs">PH History Champions 🏆</p>
-  <div class="pod" id="pod"></div>
-  <div class="ar2" id="ar2"></div>
+  <div class="rt">THAT'S A WRAP!</div>
+  <p class="rs">Thanks for playing, mga lodi! 🎉</p>
+  <div class="final-wrap" id="final-wrap"></div>
   <button class="bo" onclick="location.reload()">PLAY AGAIN</button>
 </div>
 
 <script>
-const ABLY_KEY = 'MMHXMA.LyX_CA:vmk1bi-kBXtY7hQb_JIsflNO5dIdf_lutEhLBaO6C0g';
+const ABLY_KEY='MMHXMA.LyX_CA:vmk1bi-kBXtY7hQb_JIsflNO5dIdf_lutEhLBaO6C0g';
 const AC=[{bg:'#1e1535',color:'#a78bfa'},{bg:'#0f2318',color:'#4ade80'},{bg:'#2a1010',color:'#f87171'},{bg:'#0e1d2e',color:'#60a5fa'},{bg:'#2a2208',color:'#fbbf24'},{bg:'#2a0e20',color:'#f472b6'},{bg:'#082a25',color:'#34d399'},{bg:'#1e2a08',color:'#a3e635'}];
+
 const Q=[
-  {cat:"Heroes & Figures",q:"Sino ang itinuturing na 'Ama ng Rebolusyong Pilipino'?",c:["Jose Rizal","Andres Bonifacio","Apolinario Mabini","Emilio Aguinaldo"],ans:1,fact:"Si Andres Bonifacio ang nagtatag ng Katipunan noong 1892."},
-  {cat:"Colonial History",q:"Noong ilang taon dumating si Ferdinand Magellan sa Pilipinas?",c:["1521","1565","1543","1498"],ans:0,fact:"Dumating si Magellan noong Marso 1521 at namatay sa Labanan ng Mactan."},
-  {cat:"National Symbols",q:"Ilang bituin ang nasa watawat ng Pilipinas?",c:["2 — Luzon at Visayas","3 — Luzon, Visayas, Mindanao","4 — apat na rehiyon","8 — walong probinsya"],ans:1,fact:"Ang tatlong bituin ay kumakatawan sa Luzon, Visayas, at Mindanao."},
-  {cat:"Heroes & Figures",q:"Sino ang bayaning Pilipino na pumatay kay Magellan sa Labanan ng Mactan?",c:["Tupas","Humabon","Lapu-Lapu","Soliman"],ans:2,fact:"Si Lapu-Lapu ang pinuno ng Mactan — itinuturing na unang bayani ng Pilipinas."},
-  {cat:"Independence",q:"Kailan opisyal na nakamit ng Pilipinas ang kalayaan mula sa Estados Unidos?",c:["Hunyo 12, 1898","Hulyo 4, 1946","Marso 17, 1935","Agosto 21, 1983"],ans:1,fact:"Ang Hulyo 4, 1946 ang opisyal na araw ng kalayaan mula sa USA."},
-  {cat:"Modern History",q:"Anong taon ang EDSA People Power Revolution?",c:["1972","1983","1986","1989"],ans:2,fact:"Ang EDSA Revolution ay naganap noong Pebrero 22-25, 1986."},
-  {cat:"Culture & Geography",q:"Ano ang pinakamataas na bundok sa Pilipinas?",c:["Bundok Mayon","Bundok Pulag","Bundok Pinatubo","Bundok Apo"],ans:3,fact:"Ang Bundok Apo sa Davao del Sur ay 2,954 metros."},
-  {cat:"Colonial History",q:"Kanino pinangalanan ang Pilipinas?",c:["Haring Felipe I","Haring Felipe II","Ferdinand Magellan","Papa Alexander VI"],ans:1,fact:"Pinangalanan sa Haring Felipe II ng Espanya noong 1543."},
-  {cat:"Heroes & Figures",q:"Anong nobela ni Rizal ang nagbigay-inspirasyon sa rebolusyon?",c:["El Filibusterismo","Noli Me Tangere","Florante at Laura","Ibong Adarna"],ans:1,fact:"'Noli Me Tangere' ay inilathala noong 1887."},
-  {cat:"National Symbols",q:"Ano ang pambansang wika ng Pilipinas ayon sa konstitusyon?",c:["Tagalog","Pilipino","Filipino","Cebuano"],ans:2,fact:"Ang Filipino ang opisyal na pambansang wika ng Pilipinas."},
+  {q:'Anong ulam ang madalas i-partner sa sinigang?',hint:''},
+  {q:'Kumpletuhin: "Bahala na si ______."',hint:'Fill in the blank!'},
+  {q:'Ano ang pinaka-common na laman ng baon sa office kapag petsa de peligro?',hint:''},
+  {q:'Anong tawag sa maliit na tindahan sa kanto?',hint:''},
+  {q:'Sino ang kilalang "Pambansang Kamao" ng Pilipinas?',hint:'Bonus kung alam full name 😄'},
+  {q:'"____ seconds rule!" — anong number?',hint:'Kapag nahulog ang pagkain 😂'},
+  {q:'Anong softdrink ang madalas i-partner sa fast food dito sa PH?',hint:''},
+  {q:'Kumpletuhin: "Pag may tiyaga, may ______."',hint:'Fill in the blank!'},
+  {q:'Ano ang tawag sa traffic na halos di na gumagalaw?',hint:'Pinoy term 😅'},
+  {q:'Anong app ang pinaka ginagamit pang chat sa Pilipinas?',hint:''},
+  {q:'Ano ang tawag sa jeep na puno na pero pinipilit pa rin sumakay?',hint:'😂'},
+  {q:'Anong ulam ang laging present sa handaan?',hint:'Kahit anong acceptable answer!'},
+  {q:'Sino ang "Hari ng Sablay" sa mga last-minute tasks?',hint:'Self-reflect 😆'},
+  {q:'Anong ginagawa mo kapag nawalan ng internet habang may meeting?',hint:''},
+  {q:'Kumpletuhin: "Kape muna bago ______."',hint:'Fill in the blank!'},
 ];
 
-let ably, channel, sessionId;
-let players={}, scores={}, buzzOrder=[];
-let curQ=0, timerIv=null, timeLeft=15, revealed=false, gameStarted=false;
+let ably,channel,sessionId;
+let players={},scores={},buzzOrder=[];
+let curQ=0,gameStarted=false;
 
 const ini=n=>n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
 const gci=id=>Math.max(0,Object.keys(players).indexOf(id)%8);
@@ -185,13 +176,7 @@ const toast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.c
 const showScreen=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');};
 
 function broadcastState(){
-  const q=Q[curQ];
-  channel.publish('state',{
-    gameStarted, q:curQ,
-    phase: revealed?'reveal':'question',
-    ans: revealed?q.ans:-1,
-    ansText: revealed?q.c[q.ans]:''
-  });
+  channel.publish('state',{gameStarted,q:curQ,phase:'question'});
 }
 
 async function createSession(){
@@ -200,96 +185,92 @@ async function createSession(){
   document.getElementById('bcreate').disabled=true;
   document.getElementById('bcreate').textContent='CONNECTING...';
 
-  ably = new Ably.Realtime(ABLY_KEY);
+  ably=new Ably.Realtime(ABLY_KEY);
   await new Promise(r=>ably.connection.once('connected',r));
-  channel = ably.channels.get(`buzzer-${sessionId}`);
+  channel=ably.channels.get('buzzer-'+sessionId);
 
-  channel.subscribe('join', data=>{
+  channel.subscribe('player-join',function(msg){
+    const data=msg.data;
+    if(!data||!data.id||!data.name)return;
     if(!players[data.id]){
       players[data.id]=data.name;
       scores[data.id]=0;
       renderWaiting();
       renderPlayers();
-      toast(`🙋 ${data.name} joined!`);
+      toast('🙋 '+data.name+' joined!');
     }
-    // Send state to new joiner
     broadcastState();
   });
 
-  channel.subscribe('buzz', data=>{
-    if(revealed||buzzOrder.find(b=>b.id===data.id)||buzzOrder.length>=3)return;
-    buzzOrder.push({id:data.id,name:data.name,time:data.time});
+  channel.subscribe('buzz',function(msg){
+    const data=msg.data;
+    if(!data||!data.id||!data.name)return;
+    if(buzzOrder.find(function(b){return b.id===data.id;})||buzzOrder.length>=3)return;
+    buzzOrder.push({id:data.id,name:data.name});
     renderBuzz();
-    toast(`🔔 ${['1ST','2ND','3RD'][buzzOrder.length-1]}: ${data.name}!`);
+    toast('🔔 '+['1ST','2ND','3RD'][buzzOrder.length-1]+': '+data.name+'!');
   });
 
-  const purl=`${location.origin}${location.pathname.replace('host.html','player.html')}?session=${sessionId}`;
+  const purl=location.origin+location.pathname.replace('host.html','player.html')+'?session='+sessionId;
   document.getElementById('surl').textContent=purl;
   document.getElementById('sbox').style.display='block';
   document.getElementById('wbox').style.display='block';
   document.getElementById('blaunch').style.display='block';
   document.getElementById('bcreate').textContent='SESSION CREATED ✓';
   toast('Session created! Share the link 🎉');
+
+  // Broadcast state every 2s for late joiners
+  setInterval(function(){if(gameStarted)broadcastState();},2000);
 }
 
-function copyUrl(){navigator.clipboard.writeText(document.getElementById('surl').textContent).then(()=>toast('Link copied! 📋'));}
+function copyUrl(){navigator.clipboard.writeText(document.getElementById('surl').textContent).then(function(){toast('Link copied! 📋');});}
 
 function renderWaiting(){
   const names=Object.values(players);
-  document.getElementById('wcnt').textContent=`${names.length} player${names.length!==1?'s':''} online`;
-  document.getElementById('chips').innerHTML=names.map(n=>`<div class="chip">${n}</div>`).join('');
+  document.getElementById('wcnt').textContent=names.length+' player'+(names.length!==1?'s':'')+' online';
+  document.getElementById('chips').innerHTML=names.map(function(n){return '<div class="chip">'+n+'</div>';}).join('');
 }
 
 function renderPlayers(){
-  const s=Object.entries(players).sort((a,b)=>(scores[b[0]]||0)-(scores[a[0]]||0));
+  const s=Object.entries(players).sort(function(a,b){return (scores[b[0]]||0)-(scores[a[0]]||0);});
   document.getElementById('ppanel').innerHTML=s.length
-    ?s.map(([id,name])=>`<div class="pr">${avEl(name,id,28)}<span style="flex:1;font-size:13px;font-weight:500;">${name}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);">${scores[id]||0}</span><div class="od"></div></div>`).join('')
+    ?s.map(function(e){const id=e[0],name=e[1];return '<div class="pr">'+avEl(name,id,28)+'<span style="flex:1;font-size:13px;font-weight:500;">'+name+'</span><div class="od"></div></div>';}).join('')
     :'<p style="font-size:13px;color:var(--muted2);font-style:italic;">No players yet...</p>';
 }
 
 function renderBuzz(){
   const rk=['1ST','2ND','3RD'],rc=['r1','r2','r3'];
   document.getElementById('bzlist').innerHTML=buzzOrder.length
-    ?buzzOrder.map((b,i)=>`<div class="bzi"><span class="bzr ${rc[i]}">${rk[i]}</span>${avEl(b.name,b.id,34)}<div><div style="font-size:14px;font-weight:500;">${b.name}</div><div style="font-size:11px;color:var(--muted);">${b.time}s after question</div></div></div>`).join('')
+    ?buzzOrder.map(function(b,i){return '<div class="bzi"><span class="bzr '+rc[i]+'">'+rk[i]+'</span>'+avEl(b.name,b.id,36)+'<div style="font-size:15px;font-weight:600;">'+b.name+'</div></div>';}).join('')
     :'<div class="bze">Waiting for buzzes...</div>';
+}
+
+function clearBuzz(){
+  buzzOrder=[];
+  renderBuzz();
+  channel.publish('state',{gameStarted,q:curQ,phase:'question',cleared:true});
 }
 
 function launchGame(){
   gameStarted=true;
   showScreen('game');
-  // Broadcast state every 2s so late joiners always get current state
-  setInterval(()=>{ if(gameStarted) broadcastState(); }, 2000);
   broadcastState();
   loadQ();
 }
 
 function loadQ(){
-  revealed=false;buzzOrder=[];timeLeft=15;
   const q=Q[curQ];
-  document.getElementById('qlbl').textContent=`Q ${curQ+1} / ${Q.length}`;
-  document.getElementById('pgf').style.width=`${((curQ+1)/Q.length)*100}%`;
-  document.getElementById('qcat').textContent=q.cat;
+  document.getElementById('qlbl').textContent='Q '+(curQ+1)+' / '+Q.length;
+  document.getElementById('pgf').style.width=(((curQ+1)/Q.length)*100)+'%';
+  document.getElementById('qnum').textContent='QUESTION '+(curQ+1);
   document.getElementById('qtxt').textContent=q.q;
-  document.getElementById('fact').classList.remove('show');
-  document.getElementById('ftxt').textContent=q.fact;
-  document.getElementById('brev').className='br show';
-  document.getElementById('bnxt').className='bn';
-  document.getElementById('bnxt').textContent=curQ<Q.length-1?'NEXT →':'SEE RESULTS →';
-  document.getElementById('choices').innerHTML=q.c.map((c,i)=>`<div class="ch" id="ch${i}"><span class="chl">${'ABCD'[i]}</span><span>${c}</span></div>`).join('');
+  const hint=document.getElementById('qhint');
+  if(q.hint){hint.textContent=q.hint;hint.style.display='inline-block';}
+  else{hint.style.display='none';}
+  document.getElementById('bnxt').textContent=curQ<Q.length-1?'NEXT QUESTION →':'FINISH GAME →';
+  document.getElementById('bprev').style.display=curQ>0?'inline-block':'none';
+  buzzOrder=[];
   renderBuzz();
-  const t=document.getElementById('tmr');t.textContent=15;t.className='tmr';
-  broadcastState();
-  clearInterval(timerIv);
-  timerIv=setInterval(()=>{timeLeft--;t.textContent=timeLeft;if(timeLeft<=5)t.className='tmr urgent';if(timeLeft<=0)clearInterval(timerIv);},1000);
-}
-
-function revealAnswer(){
-  revealed=true;clearInterval(timerIv);
-  document.getElementById('tmr').className='tmr';
-  document.getElementById(`ch${Q[curQ].ans}`).classList.add('correct');
-  document.getElementById('fact').classList.add('show');
-  document.getElementById('brev').className='br';
-  document.getElementById('bnxt').classList.add('show');
   broadcastState();
 }
 
@@ -299,20 +280,17 @@ function nextQuestion(){
   else loadQ();
 }
 
+function prevQ(){
+  if(curQ>0){curQ--;loadQ();}
+}
+
 function showResults(){
   showScreen('results');
   channel.publish('state',{gameStarted:true,phase:'done'});
-  const s=Object.entries(scores).sort((a,b)=>b[1]-a[1]),max=s[0]?.[1]||1,top=s.slice(0,3);
-  const medals=['🥇','🥈','🥉'],po=top.length>=3?[top[1],top[0],top[2]]:top.length===2?[top[1],top[0]]:top;
-  const pc=top.length>=3?['p2','p1','p3']:top.length===2?['p2','p1']:['p1'];
-  document.getElementById('pod').innerHTML=po.map((p,oi)=>{
-    const ri=top.indexOf(p),name=players[p[0]]||p[0],c=AC[gci(p[0])];
-    return `<div class="pc ${pc[oi]}"><span class="pm">${medals[ri]}</span><div style="width:52px;height:52px;border-radius:50%;background:${c.bg};color:${c.color};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;">${ini(name)}</div><span style="font-size:14px;font-weight:600;text-align:center;">${name}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--accent);">${p[1]}</span><span style="font-size:11px;color:var(--muted);margin-top:-6px;margin-bottom:10px;">points</span></div>`;
-  }).join('');
-  document.getElementById('ar2').innerHTML=s.map(([id,pts],i)=>{
-    const name=players[id]||id,c=AC[gci(id)];
-    return `<div class="rrow"><span class="rrk">${i+1}</span><div style="width:36px;height:36px;border-radius:50%;background:${c.bg};color:${c.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;">${ini(name)}</div><span style="flex:1;font-size:14px;font-weight:500;">${name}</span><div class="rrbw"><div class="rrb" style="width:${Math.round((pts/max)*100)}%"></div></div><span class="rrp">${pts}</span></div>`;
-  }).join('');
+  const sorted=Object.entries(players);
+  document.getElementById('final-wrap').innerHTML=sorted.length
+    ?sorted.map(function(e,i){const id=e[0],name=e[1];const c=AC[gci(id)];return '<div class="final-row"><span class="fr-rank">'+(i+1)+'</span><div class="fr-av" style="background:'+c.bg+';color:'+c.color+'">'+ini(name)+'</div><span class="fr-name">'+name+'</span><span style="font-size:13px;color:var(--muted)">Thanks for playing! 🎉</span></div>';}).join('')
+    :'<p style="color:var(--muted)">No players recorded.</p>';
 }
 </script>
 </body>
