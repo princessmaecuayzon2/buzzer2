@@ -108,8 +108,8 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 <div class="toast" id="toast"></div>
 
 <div id="setup" class="screen active">
-  <div class="logo">GENERAL<br><span>KNOWLEDGE</span><br></div>
-  <p class="sub">Icebreaker Challenge</p>
+  <div class="logo">GENERAL<br><span>KNOWLEDGE</span><br>BUZZER</div>
+  <p class="sub">Sprint Retro Icebreaker · Host View</p>
   <div class="card">
     <label class="lbl">Session Code</label>
     <input class="inp" id="sinp" placeholder="e.g. sprint86" value="sprint86" maxlength="20">
@@ -168,6 +168,85 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 </div>
 
 <script>
+
+// ============ SOUND ENGINE ============
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+
+function getACtx(){
+  if(!actx) actx = new AudioCtx();
+  if(actx.state === 'suspended') actx.resume();
+  return actx;
+}
+
+function playTone(freq, type, duration, vol, delay, fadeOut){
+  var ctx = getACtx();
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = type||'sine';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime+(delay||0));
+  gain.gain.setValueAtTime(vol||0.3, ctx.currentTime+(delay||0));
+  if(fadeOut) gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+(delay||0)+duration);
+  osc.start(ctx.currentTime+(delay||0));
+  osc.stop(ctx.currentTime+(delay||0)+duration);
+}
+
+function playBuzz(){
+  // Dramatic buzzer sound
+  playTone(120,'sawtooth',0.08,0.4,0,true);
+  playTone(90,'sawtooth',0.12,0.5,0.05,true);
+  playTone(60,'square',0.3,0.6,0,true);
+  // Rising beep
+  var ctx=getACtx(); var o=ctx.createOscillator(); var g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sine'; o.frequency.setValueAtTime(400,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.1);
+  g.gain.setValueAtTime(0.4,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+  o.start(ctx.currentTime); o.stop(ctx.currentTime+0.15);
+}
+
+function playCorrect(){
+  // Fanfare!
+  var notes=[523,659,784,1047];
+  notes.forEach(function(f,i){ playTone(f,'sine',0.18,0.35,i*0.1,true); });
+  playTone(1047,'sine',0.4,0.5,0.4,true);
+}
+
+function playWrong(){
+  // Wah-wah
+  playTone(200,'sawtooth',0.15,0.4,0,true);
+  playTone(150,'sawtooth',0.15,0.4,0.15,true);
+  playTone(100,'sawtooth',0.2,0.5,0.3,true);
+}
+
+function playReveal(){
+  // Drum roll + ding
+  for(var i=0;i<8;i++){
+    playTone(200,'square',0.04,0.2,i*0.06,true);
+  }
+  playTone(880,'sine',0.3,0.5,0.55,true);
+  playTone(1100,'sine',0.3,0.4,0.7,true);
+}
+
+function playGameOver(){
+  var melody=[523,440,349,262];
+  melody.forEach(function(f,i){ playTone(f,'sine',0.35,0.4,i*0.22,true); });
+  playTone(196,'sine',0.5,0.6,0.9,true);
+}
+
+function playNextQ(){
+  playTone(600,'sine',0.08,0.25,0,true);
+  playTone(800,'sine',0.08,0.25,0.1,true);
+}
+
+// BGM — upbeat game show loop using oscillators
+
+// ============ END SOUND ENGINE ============
+
+
+
 const ABLY_KEY='MMHXMA.LyX_CA:vmk1bi-kBXtY7hQb_JIsflNO5dIdf_lutEhLBaO6C0g';
 const AC=[{bg:'#1e1535',color:'#a78bfa'},{bg:'#0f2318',color:'#4ade80'},{bg:'#2a1010',color:'#f87171'},{bg:'#0e1d2e',color:'#60a5fa'},{bg:'#2a2208',color:'#fbbf24'},{bg:'#2a0e20',color:'#f472b6'},{bg:'#082a25',color:'#34d399'},{bg:'#1e2a08',color:'#a3e635'}];
 
@@ -233,6 +312,7 @@ async function createSession(){
     if(answered)return;
     if(buzzOrder.find(function(b){return b.id===data.id;})||buzzOrder.length>=3)return;
     buzzOrder.push({id:data.id,name:data.name});
+    playBuzz();
     renderBuzz();
     toast('🔔 '+['1ST','2ND','3RD'][buzzOrder.length-1]+': '+data.name+'!');
   });
@@ -324,6 +404,7 @@ function markAnswer(idx){
     var activeBuzzer=buzzOrder.length?buzzOrder[0]:null;
     badge.innerHTML='<div class="result-badge correct">✅ CORRECT!'+(activeBuzzer?' — '+activeBuzzer.name+' gets a point!':'')+'</div>';
     if(activeBuzzer){scores[activeBuzzer.id]=(scores[activeBuzzer.id]||0)+10;renderPlayers();}
+    playCorrect();
     broadcastState({phase:'correct',ans:q.ans});
     document.getElementById('btn-reveal').style.display='none';
     document.getElementById('btn-clear').style.display='none';
@@ -338,6 +419,7 @@ function markAnswer(idx){
     var msg2=wrongBuzzer?wrongBuzzer.name+' was wrong!':'❌ WRONG!';
     if(nextBuzzer){msg2+=' Calling '+nextBuzzer.name+'...';}else{msg2+=' No more buzzers.';}
     badge.innerHTML='<div class="result-badge wrong">❌ '+msg2+'</div>';
+    playWrong();
     broadcastState({phase:'wrong',ansIdx:idx});
     renderBuzz();
     document.getElementById('btn-reveal').style.display='inline-block';
@@ -348,6 +430,7 @@ function markAnswer(idx){
 
 function revealAnswer(){
   answered=true;
+  playReveal();
   var q=Q[curQ];
   for(var i=0;i<4;i++){
     var btn=document.getElementById('ch'+i);
@@ -377,12 +460,14 @@ function clearBuzzAndReset(){
 }
 
 function nextQ(){
+  playNextQ();
   curQ++;
   if(curQ>=Q.length)showResults();
   else loadQ();
 }
 
 function showResults(){
+  playGameOver();
   showScreen('results');
   channel.publish('state',{gameStarted:true,phase:'done'});
   var sorted=Object.entries(scores).sort(function(a,b){return b[1]-a[1];});

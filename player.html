@@ -58,7 +58,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 
 <div class="screen active" id="sjoin">
   <div class="logo">GENERAL<br><span>KNOWLEDGE</span><br>BUZZER</div>
-  <p class="sub">Icebreaker</p>
+  <p class="sub">Sprint Retro Icebreaker</p>
   <div class="jcard">
     <label class="lbl">Your name</label>
     <input class="inp" id="ninp" placeholder="Enter your name..." maxlength="20" onkeydown="if(event.key==='Enter')joinSession()">
@@ -96,6 +96,38 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 const ABLY_KEY='MMHXMA.LyX_CA:vmk1bi-kBXtY7hQb_JIsflNO5dIdf_lutEhLBaO6C0g';
 const AC=[{bg:'#1e1535',color:'#a78bfa'},{bg:'#0f2318',color:'#4ade80'},{bg:'#2a1010',color:'#f87171'},{bg:'#0e1d2e',color:'#60a5fa'},{bg:'#2a2208',color:'#fbbf24'},{bg:'#2a0e20',color:'#f472b6'},{bg:'#082a25',color:'#34d399'},{bg:'#1e2a08',color:'#a3e635'}];
 
+
+// ===== PLAYER SOUNDS =====
+const PACtx = window.AudioContext || window.webkitAudioContext;
+let pactx = null;
+function getPACtx(){ if(!pactx) pactx = new PACtx(); if(pactx.state==='suspended') pactx.resume(); return pactx; }
+function pTone(f,t,dur,vol,delay){
+  var ctx=getPACtx(); var o=ctx.createOscillator(); var g=ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type=t||'sine'; o.frequency.value=f;
+  g.gain.setValueAtTime(vol||0.3,ctx.currentTime+(delay||0));
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+(delay||0)+dur);
+  o.start(ctx.currentTime+(delay||0)); o.stop(ctx.currentTime+(delay||0)+dur+0.05);
+}
+function pBuzzSound(){
+  pTone(300,'sawtooth',0.06,0.5,0);
+  pTone(200,'square',0.1,0.6,0.05);
+  pTone(800,'sine',0.15,0.4,0);
+  pTone(1000,'sine',0.1,0.3,0.08);
+}
+function pCorrectSound(){
+  pTone(523,'sine',0.15,0.4,0);
+  pTone(659,'sine',0.15,0.4,0.1);
+  pTone(784,'sine',0.15,0.4,0.2);
+  pTone(1047,'sine',0.4,0.5,0.35);
+}
+function pWrongSound(){
+  pTone(250,'sawtooth',0.12,0.4,0);
+  pTone(180,'sawtooth',0.15,0.4,0.12);
+  pTone(120,'sawtooth',0.2,0.5,0.25);
+}
+// ===== END PLAYER SOUNDS =====
+
 const params=new URLSearchParams(location.search);
 const sessionId=params.get('session')||'sprint86';
 document.getElementById('sdname').textContent=sessionId;
@@ -125,11 +157,13 @@ async function joinSession(){
     if(data.phase==='done'){showScreen('sdone');return;}
 
     if(data.phase==='correct'){
+      pCorrectSound();
       document.getElementById('bres').innerHTML='<div class="res-correct">✅ CORRECT!</div>';
       document.getElementById('bbtn').disabled=true;
       return;
     }
     if(data.phase==='wrong'){
+      pWrongSound();
       document.getElementById('bres').innerHTML='<div class="res-wrong">❌ WRONG! Next buzz?</div>';
       document.getElementById('bbtn').disabled=false;
       buzzed=false;
@@ -170,6 +204,7 @@ function loadBuzzScreen(){
 function doBuzz(){
   if(buzzed)return;
   buzzed=true;
+  pBuzzSound();
   channel.publish('buzz',{id:myId,name:myName});
   document.getElementById('bbtn').disabled=true;
   document.getElementById('bres').innerHTML='<div style="animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275)"><div style="font-size:36px">🔔</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;color:var(--accent);letter-spacing:2px;margin-top:8px;">BUZZED!</div><div style="font-size:13px;color:var(--muted);margin-top:6px;">Wait for the host to call you! 🎤</div></div>';
