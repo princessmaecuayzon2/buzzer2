@@ -109,7 +109,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 
 <div id="setup" class="screen active">
   <div class="logo">GENERAL<br><span>KNOWLEDGE</span><br>BUZZER</div>
-  <p class="sub">Icebreaker</p>
+  <p class="sub">Sprint Retro Icebreaker · Host View</p>
   <div class="card">
     <label class="lbl">Session Code</label>
     <input class="inp" id="sinp" placeholder="e.g. sprint86" value="sprint86" maxlength="20">
@@ -320,19 +320,26 @@ function markAnswer(idx){
     answered=true;
     for(var i=0;i<4;i++){document.getElementById('ch'+i).disabled=true;}
     document.getElementById('ch'+idx).classList.add('correct');
-    badge.innerHTML='<div class="result-badge correct">✅ CORRECT!'+(buzz1?' — '+buzz1.name+' gets a point!':'')+'</div>';
-    if(buzz1){scores[buzz1.id]=(scores[buzz1.id]||0)+10;renderPlayers();}
+    // Give point to whoever is CURRENTLY first in buzzOrder (the active buzzer)
+    var activeBuzzer=buzzOrder.length?buzzOrder[0]:null;
+    badge.innerHTML='<div class="result-badge correct">✅ CORRECT!'+(activeBuzzer?' — '+activeBuzzer.name+' gets a point!':'')+'</div>';
+    if(activeBuzzer){scores[activeBuzzer.id]=(scores[activeBuzzer.id]||0)+10;renderPlayers();}
     broadcastState({phase:'correct',ans:q.ans});
     document.getElementById('btn-reveal').style.display='none';
     document.getElementById('btn-clear').style.display='none';
     document.getElementById('btn-next').style.display='inline-block';
   }else{
-    // Wrong — only mark clicked as red, do NOT reveal correct answer
+    // Wrong — mark clicked as red, remove 1st buzzer from queue so 2nd becomes 1st
     document.getElementById('ch'+idx).disabled=true;
     document.getElementById('ch'+idx).classList.add('wrong');
-    badge.innerHTML='<div class="result-badge wrong">❌ WRONG! Next buzz or reveal answer.</div>';
+    // Remove the wrong buzzer from front of queue
+    var wrongBuzzer=buzzOrder.shift();
+    var nextBuzzer=buzzOrder.length?buzzOrder[0]:null;
+    var msg2=wrongBuzzer?wrongBuzzer.name+' was wrong!':'❌ WRONG!';
+    if(nextBuzzer){msg2+=' Calling '+nextBuzzer.name+'...';}else{msg2+=' No more buzzers.';}
+    badge.innerHTML='<div class="result-badge wrong">❌ '+msg2+'</div>';
     broadcastState({phase:'wrong',ansIdx:idx});
-    // Keep reveal and next visible, allow more buzzes
+    renderBuzz();
     document.getElementById('btn-reveal').style.display='inline-block';
     document.getElementById('btn-clear').style.display='inline-block';
     document.getElementById('btn-next').style.display='inline-block';
