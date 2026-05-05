@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Player — Sprint Retro Buzzer</title>
+<title>Player — GK Buzzer</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
 <style>
@@ -13,7 +13,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .screen{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:420px;text-align:center;}
 .screen.active{display:flex;}
 
-.logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:3px;line-height:1;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:3px;line-height:1.1;}
 .logo span{color:var(--accent);}
 .sub{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px;margin-bottom:2rem;}
 .jcard{background:var(--surface);border:0.5px solid var(--border2);border-radius:20px;padding:1.75rem;width:100%;}
@@ -25,27 +25,29 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .bjoin{width:100%;background:var(--accent);color:#111;border:none;border-radius:12px;padding:15px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;}
 .bjoin:disabled{opacity:0.4;cursor:not-allowed;}
 
-/* WAIT */
 .wait-icon{font-size:56px;margin-bottom:1rem;animation:bob 2s ease-in-out infinite;}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.wt{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin-bottom:8px;}
+.wt{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;margin-bottom:8px;}
 .ws{font-size:14px;color:var(--muted);line-height:1.6;}
 .pbadge{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:0.5px solid var(--border2);border-radius:99px;padding:8px 18px 8px 8px;margin-top:1.5rem;}
 .pav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
 
-/* BUZZ SCREEN */
 #sbuzz{background:radial-gradient(ellipse at 50% 40%,#1a1530 0%,#080810 65%);min-height:100vh;position:fixed;top:0;left:0;right:0;bottom:0;}
-.bqn{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:1.5rem;}
-.bbtn{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe066,#f5c842 50%,#c99a1a);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;box-shadow:0 0 0 0 rgba(245,200,66,0.4),0 8px 32px rgba(0,0,0,0.6);transition:transform 0.1s;animation:glow 2.5s ease-in-out infinite;user-select:none;margin-bottom:1.5rem;}
+.bqn{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2rem;}
+.bbtn{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe066,#f5c842 50%,#c99a1a);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:transform 0.1s,opacity 0.2s;animation:glow 2.5s ease-in-out infinite;user-select:none;margin-bottom:1.5rem;}
 @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(245,200,66,0.3),0 8px 32px rgba(0,0,0,0.5)}50%{box-shadow:0 0 0 24px rgba(245,200,66,0.08),0 8px 40px rgba(245,200,66,0.25)}}
 .bbtn:active{transform:scale(0.91);}
 .bbtn:disabled{filter:grayscale(0.7);opacity:0.45;animation:none;cursor:not-allowed;}
 .bell{font-size:56px;line-height:1;}
 .blbl{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#111;}
-.bres{font-size:14px;color:var(--muted);line-height:1.7;}
-@keyframes popIn{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+.bres{font-size:14px;color:var(--muted);line-height:1.7;max-width:280px;}
 
-/* DONE */
+/* Result states shown on player */
+.res-correct{background:rgba(62,207,114,0.12);border:1.5px solid var(--green);border-radius:12px;padding:16px 20px;color:var(--green);font-weight:600;font-size:16px;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
+.res-wrong{background:rgba(232,80,58,0.12);border:1.5px solid var(--red);border-radius:12px;padding:16px 20px;color:var(--red);font-weight:600;font-size:16px;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
+.res-reveal{background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:16px 20px;color:var(--accent);font-weight:600;font-size:15px;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+
 #sdone{min-height:100vh;}
 .dicon{font-size:72px;margin-bottom:1rem;}
 .dtitle{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;margin-bottom:8px;}
@@ -55,8 +57,8 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 <body>
 
 <div class="screen active" id="sjoin">
-  <div class="logo">SPRINT<br><span>BUZZER</span></div>
-  <p class="sub">Retro Icebreaker Game</p>
+  <div class="logo">GENERAL<br><span>KNOWLEDGE</span><br>BUZZER</div>
+  <p class="sub">Icebreaker</p>
   <div class="jcard">
     <label class="lbl">Your name</label>
     <input class="inp" id="ninp" placeholder="Enter your name..." maxlength="20" onkeydown="if(event.key==='Enter')joinSession()">
@@ -81,7 +83,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
     <span class="bell">🔔</span>
     <span class="blbl">BUZZ!</span>
   </button>
-  <div class="bres" id="bres">Know the answer? Buzz first! 🎯</div>
+  <div class="bres" id="bres">Know the answer? Buzz in! 🎯</div>
 </div>
 
 <div class="screen" id="sdone">
@@ -101,8 +103,7 @@ document.getElementById('sdname').textContent=sessionId;
 let ably,channel;
 let myId='p_'+Math.random().toString(36).slice(2,9);
 let myName='',myCI=Math.floor(Math.random()*8);
-let buzzed=false,curQ=0;
-let lastPhase='',lastQ=-1;
+let buzzed=false,curQ=0,lastPhase='',lastQ=-1;
 
 const ini=function(n){return n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);};
 const showScreen=function(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');};
@@ -118,27 +119,41 @@ async function joinSession(){
   await new Promise(function(r){ably.connection.once('connected',r);});
   channel=ably.channels.get('buzzer-'+sessionId);
 
-  // Subscribe FIRST
   await channel.subscribe('state',function(msg){
     const data=msg.data;
     if(!data||!data.gameStarted)return;
     if(data.phase==='done'){showScreen('sdone');return;}
+
+    if(data.phase==='correct'){
+      document.getElementById('bres').innerHTML='<div class="res-correct">✅ CORRECT!</div>';
+      document.getElementById('bbtn').disabled=true;
+      return;
+    }
+    if(data.phase==='wrong'){
+      document.getElementById('bres').innerHTML='<div class="res-wrong">❌ WRONG! Next buzz?</div>';
+      document.getElementById('bbtn').disabled=false;
+      buzzed=false;
+      return;
+    }
+    if(data.phase==='reveal'){
+      document.getElementById('bres').innerHTML='<div class="res-reveal">🔎 Answer revealed by host!</div>';
+      document.getElementById('bbtn').disabled=true;
+      return;
+    }
     if(data.phase==='question'){
-      if(lastQ!==data.q||lastPhase!=='question'||data.cleared){
+      if(lastQ!==data.q||lastPhase!=='question'){
         lastPhase='question';lastQ=data.q;curQ=data.q;
         loadBuzzScreen();
       }
     }
   });
 
-  // Show wait screen
   const c=AC[myCI];
   const av=document.getElementById('wav');
   av.style.background=c.bg;av.style.color=c.color;av.textContent=ini(name);
   document.getElementById('wnm').textContent=name;
   showScreen('swait');
 
-  // Publish join after delay
   setTimeout(function(){
     channel.publish('player-join',{id:myId,name:myName});
   },800);
@@ -147,12 +162,8 @@ async function joinSession(){
 function loadBuzzScreen(){
   buzzed=false;
   document.getElementById('bqn').textContent='Question '+(curQ+1)+' of 15';
-  document.getElementById('bres').textContent='Know the answer? Buzz first! 🎯';
-  const btn=document.getElementById('bbtn');
-  btn.disabled=false;
-  btn.style.filter='';
-  btn.style.opacity='';
-  btn.style.animation='glow 2.5s ease-in-out infinite';
+  document.getElementById('bres').textContent='Know the answer? Buzz in! 🎯';
+  document.getElementById('bbtn').disabled=false;
   showScreen('sbuzz');
 }
 
@@ -160,8 +171,7 @@ function doBuzz(){
   if(buzzed)return;
   buzzed=true;
   channel.publish('buzz',{id:myId,name:myName});
-  const btn=document.getElementById('bbtn');
-  btn.disabled=true;
+  document.getElementById('bbtn').disabled=true;
   document.getElementById('bres').innerHTML='<div style="animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275)"><div style="font-size:36px">🔔</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;color:var(--accent);letter-spacing:2px;margin-top:8px;">BUZZED!</div><div style="font-size:13px;color:var(--muted);margin-top:6px;">Wait for the host to call you! 🎤</div></div>';
 }
 </script>

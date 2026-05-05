@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Host — Sprint Retro Buzzer</title>
+<title>Host — General Knowledge Buzzer</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
 <style>
@@ -13,7 +13,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .screen{display:none;}.screen.active{display:flex;}
 
 #setup{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:radial-gradient(ellipse at 50% 20%,#1c1830 0%,#080810 60%);}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,96px);letter-spacing:4px;line-height:1;text-align:center;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);letter-spacing:4px;line-height:1;text-align:center;}
 .logo span{color:var(--accent);}
 .sub{font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:8px;margin-bottom:3rem;text-align:center;}
 .card{background:var(--surface);border:0.5px solid var(--border2);border-radius:20px;padding:2rem;width:100%;max-width:480px;}
@@ -40,40 +40,63 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .prog{flex:1;height:3px;background:var(--surface2);border-radius:99px;overflow:hidden;}
 .prog-f{height:100%;background:var(--accent);border-radius:99px;transition:width 0.4s;}
 
-.gg{display:grid;grid-template-columns:1fr 360px;gap:16px;max-width:1200px;margin:0 auto;width:100%;}
-.qcard{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:2rem 2.5rem;margin-bottom:12px;}
-.qnum{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
-.qtxt{font-size:clamp(22px,3vw,32px);font-weight:500;line-height:1.45;}
-.hint-tag{display:inline-block;margin-top:12px;background:var(--surface2);border-radius:99px;padding:4px 14px;font-size:12px;color:var(--muted);}
+.gg{display:grid;grid-template-columns:1fr 340px;gap:16px;max-width:1200px;margin:0 auto;width:100%;}
 
-.ar{display:flex;gap:10px;margin-top:4px;}
-.bn{background:var(--accent);color:#111;border:none;border-radius:10px;padding:12px 28px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;transition:opacity 0.15s;}
-.bn:hover{opacity:0.88;}
-.bn.outline{background:transparent;color:var(--text);border:0.5px solid var(--border2);}
-.bn.outline:hover{border-color:var(--accent);}
+/* Question card */
+.qcard{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:1.75rem 2rem;margin-bottom:12px;}
+.qnum{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+.qtxt{font-size:clamp(18px,2.2vw,24px);font-weight:500;line-height:1.5;}
 
+/* Choice buttons — host clicks these to mark correct/wrong */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.ch{background:var(--surface);border:2px solid var(--border2);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color 0.15s,background 0.15s;font-family:'Sora',sans-serif;text-align:left;}
+.ch:hover:not(:disabled){border-color:var(--accent);background:var(--surface2);}
+.ch:disabled{cursor:default;}
+.chl{width:32px;height:32px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);flex-shrink:0;transition:background 0.15s,color 0.15s;}
+.ch.correct{border-color:var(--green);background:rgba(62,207,114,0.1);}
+.ch.correct .chl{background:var(--green);color:#fff;}
+.ch.wrong{border-color:var(--red);background:rgba(232,80,58,0.1);}
+.ch.wrong .chl{background:var(--red);color:#fff;}
+
+.action-row{display:flex;gap:10px;flex-wrap:wrap;}
+.abtn{border:none;border-radius:10px;padding:11px 22px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;transition:opacity 0.15s;}
+.abtn.primary{background:var(--accent);color:#111;}
+.abtn.primary:hover{opacity:0.88;}
+.abtn.secondary{background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);}
+.abtn.secondary:hover{border-color:var(--accent);}
+.abtn.danger{background:rgba(232,80,58,0.15);color:var(--red);border:0.5px solid var(--red);}
+.abtn.danger:hover{background:rgba(232,80,58,0.25);}
+
+/* Right panel */
 .rc{display:flex;flex-direction:column;gap:12px;}
 .panel{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:1.25rem;}
 .pt{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
-.bzlist{display:flex;flex-direction:column;gap:8px;min-height:80px;}
+.bzlist{display:flex;flex-direction:column;gap:8px;min-height:70px;}
 .bzi{display:flex;align-items:center;gap:10px;background:var(--surface2);border:0.5px solid var(--border);border-radius:10px;padding:10px 12px;animation:pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
-.bzr{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:38px;}
+.bzr{font-family:'Bebas Neue',sans-serif;font-size:20px;min-width:36px;}
 .bzr.r1{color:#f5c842;}.bzr.r2{color:#b0b0b0;}.bzr.r3{color:#cd7f32;}
-.bze{font-size:13px;color:var(--muted2);font-style:italic;text-align:center;padding:1rem 0;}
-.pr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);}
+.bze{font-size:13px;color:var(--muted2);font-style:italic;text-align:center;padding:0.75rem 0;}
+.pr{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border);}
 .pr:last-child{border-bottom:none;}
 .od{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
 
+/* Result indicator */
+.result-badge{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600;margin-bottom:12px;animation:pop 0.3s ease;}
+.result-badge.correct{background:rgba(62,207,114,0.15);color:var(--green);border:0.5px solid var(--green);}
+.result-badge.wrong{background:rgba(232,80,58,0.15);color:var(--red);border:0.5px solid var(--red);}
+
+/* Results screen */
 #results{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:radial-gradient(ellipse at 50% 30%,#101e18 0%,#080810 65%);}
 .rt{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,96px);text-align:center;line-height:1;margin-bottom:6px;}
 .rs{font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2.5rem;}
-.final-wrap{width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px;margin-bottom:2rem;}
-.final-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px 18px;}
-.fr-rank{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--muted);min-width:32px;}
-.fr-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
-.fr-name{flex:1;font-size:15px;font-weight:500;}
-.fr-pts{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);}
-.fr-label{font-size:11px;color:var(--muted);margin-left:2px;}
+.final-wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;margin-bottom:2rem;}
+.final-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:12px 16px;}
+.fr-rank{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--muted);min-width:30px;}
+.fr-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;}
+.fr-name{flex:1;font-size:14px;font-weight:500;}
+.fr-bw{flex:2;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+.fr-b{height:100%;background:var(--accent);border-radius:99px;transition:width 0.9s ease 0.3s;}
+.fr-pts{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);min-width:54px;text-align:right;}
 .bo{background:transparent;color:var(--text);border:1.5px solid var(--border2);border-radius:10px;padding:12px 28px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;}
 .bo:hover{border-color:var(--accent);}
 
@@ -85,8 +108,8 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 <div class="toast" id="toast"></div>
 
 <div id="setup" class="screen active">
-  <div class="logo">SPRINT RETRO<br><span>BUZZER</span></div>
-  <p class="sub">Icebreaker Game · Host View</p>
+  <div class="logo">GENERAL<br><span>KNOWLEDGE</span><br>BUZZER</div>
+  <p class="sub">Icebreaker</p>
   <div class="card">
     <label class="lbl">Session Code</label>
     <input class="inp" id="sinp" placeholder="e.g. sprint86" value="sprint86" maxlength="20">
@@ -107,29 +130,30 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 <div id="game" class="screen">
   <div class="gh">
     <span class="ql" id="qlbl">Q 1 / 15</span>
-    <div class="prog"><div class="prog-f" id="pgf"></div></div>
-    <span style="font-size:13px;color:var(--muted);" id="qcount">1/15</span>
+    <div class="prog"><div class="prog-f" id="pgf" style="width:6.67%"></div></div>
   </div>
   <div class="gg">
     <div>
       <div class="qcard">
-        <div class="qnum" id="qnum">QUESTION 1</div>
+        <div class="qnum" id="qnum">QUESTION 1 OF 15</div>
         <div class="qtxt" id="qtxt"></div>
-        <div class="hint-tag" id="qhint" style="display:none;"></div>
       </div>
-      <div class="ar">
-        <button class="bn outline" onclick="prevQ()" id="bprev" style="display:none;">← PREV</button>
-        <button class="bn" id="bnxt" onclick="nextQuestion()">NEXT QUESTION →</button>
+      <div id="result-badge-wrap"></div>
+      <div class="choices" id="choices"></div>
+      <div class="action-row" id="action-row">
+        <button class="abtn danger" id="btn-reveal" onclick="revealAnswer()">REVEAL ANSWER</button>
+        <button class="abtn secondary" id="btn-clear" onclick="clearBuzzAndReset()" style="display:none;">CLEAR & RETRY</button>
+        <button class="abtn primary" id="btn-next" onclick="nextQ()" style="display:none;">NEXT →</button>
       </div>
     </div>
     <div class="rc">
       <div class="panel">
         <div class="pt">Buzz Order 🔔</div>
         <div class="bzlist" id="bzlist"><div class="bze">Waiting for buzzes...</div></div>
-        <button onclick="clearBuzz()" style="margin-top:10px;background:none;border:0.5px solid var(--border2);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;width:100%;">Clear Buzzes</button>
+        <button onclick="clearBuzzOnly()" style="margin-top:10px;background:none;border:0.5px solid var(--border2);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;width:100%;">Clear Buzzes</button>
       </div>
       <div class="panel">
-        <div class="pt">Players Online</div>
+        <div class="pt">Scoreboard</div>
         <div id="ppanel"><p style="font-size:13px;color:var(--muted2);font-style:italic;">No players yet...</p></div>
       </div>
     </div>
@@ -137,8 +161,8 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 </div>
 
 <div id="results" class="screen">
-  <div class="rt">THAT'S A WRAP!</div>
-  <p class="rs">Thanks for playing, mga lodi! 🎉</p>
+  <div class="rt">GAME OVER!</div>
+  <p class="rs">Final Scoreboard 🏆</p>
   <div class="final-wrap" id="final-wrap"></div>
   <button class="bo" onclick="location.reload()">PLAY AGAIN</button>
 </div>
@@ -148,35 +172,37 @@ const ABLY_KEY='MMHXMA.LyX_CA:vmk1bi-kBXtY7hQb_JIsflNO5dIdf_lutEhLBaO6C0g';
 const AC=[{bg:'#1e1535',color:'#a78bfa'},{bg:'#0f2318',color:'#4ade80'},{bg:'#2a1010',color:'#f87171'},{bg:'#0e1d2e',color:'#60a5fa'},{bg:'#2a2208',color:'#fbbf24'},{bg:'#2a0e20',color:'#f472b6'},{bg:'#082a25',color:'#34d399'},{bg:'#1e2a08',color:'#a3e635'}];
 
 const Q=[
-  {q:'Anong ulam ang madalas i-partner sa sinigang?',hint:''},
-  {q:'Kumpletuhin: "Bahala na si ______."',hint:'Fill in the blank!'},
-  {q:'Ano ang pinaka-common na laman ng baon sa office kapag petsa de peligro?',hint:''},
-  {q:'Anong tawag sa maliit na tindahan sa kanto?',hint:''},
-  {q:'Sino ang kilalang "Pambansang Kamao" ng Pilipinas?',hint:'Bonus kung alam full name 😄'},
-  {q:'"____ seconds rule!" — anong number?',hint:'Kapag nahulog ang pagkain 😂'},
-  {q:'Anong softdrink ang madalas i-partner sa fast food dito sa PH?',hint:''},
-  {q:'Kumpletuhin: "Pag may tiyaga, may ______."',hint:'Fill in the blank!'},
-  {q:'Ano ang tawag sa traffic na halos di na gumagalaw?',hint:'Pinoy term 😅'},
-  {q:'Anong app ang pinaka ginagamit pang chat sa Pilipinas?',hint:''},
-  {q:'Ano ang tawag sa jeep na puno na pero pinipilit pa rin sumakay?',hint:'😂'},
-  {q:'Anong ulam ang laging present sa handaan?',hint:'Kahit anong acceptable answer!'},
-  {q:'Sino ang "Hari ng Sablay" sa mga last-minute tasks?',hint:'Self-reflect 😆'},
-  {q:'Anong ginagawa mo kapag nawalan ng internet habang may meeting?',hint:''},
-  {q:'Kumpletuhin: "Kape muna bago ______."',hint:'Fill in the blank!'},
+  {q:'Ano ang capital ng Japan?',c:['Seoul','Beijing','Tokyo','Bangkok'],ans:2},
+  {q:'Ilang continents meron sa mundo?',c:['5','6','7','8'],ans:2},
+  {q:'Ano ang pinakamalaking ocean sa Earth?',c:['Atlantic Ocean','Indian Ocean','Arctic Ocean','Pacific Ocean'],ans:3},
+  {q:'Ano ang chemical symbol ng water?',c:['CO2','H2O','O2','NaCl'],ans:1},
+  {q:'Ilang days meron sa leap year?',c:['365','366','364','360'],ans:1},
+  {q:'Ano ang largest planet sa solar system?',c:['Earth','Mars','Jupiter','Saturn'],ans:2},
+  {q:'Sino ang unang tao na naglakad sa moon?',c:['Buzz Aldrin','Yuri Gagarin','Neil Armstrong','Michael Collins'],ans:2},
+  {q:'Ano ang fastest land animal?',c:['Lion','Tiger','Cheetah','Horse'],ans:2},
+  {q:'Anong bansa ang may Eiffel Tower?',c:['Italy','Spain','Germany','France'],ans:3},
+  {q:'Ilang sides meron ang hexagon?',c:['5','6','7','8'],ans:1},
+  {q:'Ano ang tawag sa process ng plants paggawa ng pagkain?',c:['Respiration','Digestion','Photosynthesis','Transpiration'],ans:2},
+  {q:'Ano ang pinakamahabang ilog sa mundo?',c:['Amazon River','Nile River','Yangtze River','Mississippi River'],ans:1},
+  {q:'Sino ang gumawa ng Facebook?',c:['Bill Gates','Elon Musk','Mark Zuckerberg','Steve Jobs'],ans:2},
+  {q:'Ano ang tawag sa study of computers and programming?',c:['Biology','Computer Science','Engineering','Mathematics'],ans:1},
+  {q:'Ilang kulay meron ang rainbow?',c:['5','6','7','8'],ans:2},
 ];
 
 let ably,channel,sessionId;
 let players={},scores={},buzzOrder=[];
-let curQ=0,gameStarted=false;
+let curQ=0,gameStarted=false,answered=false;
 
-const ini=n=>n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-const gci=id=>Math.max(0,Object.keys(players).indexOf(id)%8);
-const avEl=(name,id,sz=34)=>{const c=AC[gci(id)];return `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${c.bg};color:${c.color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(sz*.35)}px;font-weight:600;flex-shrink:0;">${ini(name)}</div>`;};
-const toast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);};
-const showScreen=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');};
+const ini=function(n){return n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);};
+const gci=function(id){return Math.max(0,Object.keys(players).indexOf(id)%8);};
+const avEl=function(name,id,sz){sz=sz||34;var c=AC[gci(id)];return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+c.bg+';color:'+c.color+';display:flex;align-items:center;justify-content:center;font-size:'+Math.round(sz*.35)+'px;font-weight:600;flex-shrink:0;">'+ini(name)+'</div>';};
+const toast=function(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);};
+const showScreen=function(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');};
 
-function broadcastState(){
-  channel.publish('state',{gameStarted,q:curQ,phase:'question'});
+function broadcastState(extra){
+  var payload={gameStarted:gameStarted,q:curQ,phase:'question'};
+  if(extra){Object.assign(payload,extra);}
+  channel.publish('state',payload);
 }
 
 async function createSession(){
@@ -186,69 +212,72 @@ async function createSession(){
   document.getElementById('bcreate').textContent='CONNECTING...';
 
   ably=new Ably.Realtime(ABLY_KEY);
-  await new Promise(r=>ably.connection.once('connected',r));
+  await new Promise(function(r){ably.connection.once('connected',r);});
   channel=ably.channels.get('buzzer-'+sessionId);
 
   channel.subscribe('player-join',function(msg){
-    const data=msg.data;
+    var data=msg.data;
     if(!data||!data.id||!data.name)return;
     if(!players[data.id]){
       players[data.id]=data.name;
       scores[data.id]=0;
-      renderWaiting();
-      renderPlayers();
+      renderWaiting();renderPlayers();
       toast('🙋 '+data.name+' joined!');
     }
     broadcastState();
   });
 
   channel.subscribe('buzz',function(msg){
-    const data=msg.data;
+    var data=msg.data;
     if(!data||!data.id||!data.name)return;
+    if(answered)return;
     if(buzzOrder.find(function(b){return b.id===data.id;})||buzzOrder.length>=3)return;
     buzzOrder.push({id:data.id,name:data.name});
     renderBuzz();
     toast('🔔 '+['1ST','2ND','3RD'][buzzOrder.length-1]+': '+data.name+'!');
   });
 
-  const purl=location.origin+location.pathname.replace('host.html','player.html')+'?session='+sessionId;
+  var purl=location.origin+location.pathname.replace('host.html','player.html')+'?session='+sessionId;
   document.getElementById('surl').textContent=purl;
   document.getElementById('sbox').style.display='block';
   document.getElementById('wbox').style.display='block';
   document.getElementById('blaunch').style.display='block';
   document.getElementById('bcreate').textContent='SESSION CREATED ✓';
-  toast('Session created! Share the link 🎉');
+  toast('Session created! 🎉');
 
-  // Broadcast state every 2s for late joiners
   setInterval(function(){if(gameStarted)broadcastState();},2000);
 }
 
 function copyUrl(){navigator.clipboard.writeText(document.getElementById('surl').textContent).then(function(){toast('Link copied! 📋');});}
 
 function renderWaiting(){
-  const names=Object.values(players);
+  var names=Object.values(players);
   document.getElementById('wcnt').textContent=names.length+' player'+(names.length!==1?'s':'')+' online';
   document.getElementById('chips').innerHTML=names.map(function(n){return '<div class="chip">'+n+'</div>';}).join('');
 }
 
 function renderPlayers(){
-  const s=Object.entries(players).sort(function(a,b){return (scores[b[0]]||0)-(scores[a[0]]||0);});
+  var s=Object.entries(scores).sort(function(a,b){return b[1]-a[1];});
+  var max=s.length?s[0][1]:1;
   document.getElementById('ppanel').innerHTML=s.length
-    ?s.map(function(e){const id=e[0],name=e[1];return '<div class="pr">'+avEl(name,id,28)+'<span style="flex:1;font-size:13px;font-weight:500;">'+name+'</span><div class="od"></div></div>';}).join('')
+    ?s.map(function(e,i){
+        var id=e[0],pts=e[1],name=players[id]||id;
+        var c=AC[gci(id)];
+        var pct=max>0?Math.round((pts/max)*100):0;
+        return '<div class="pr">'+avEl(name,id,26)+'<span style="flex:1;font-size:13px;font-weight:500;margin-left:6px;">'+name+'</span><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--accent);">'+pts+'</span><div class="od"></div></div>';
+      }).join('')
     :'<p style="font-size:13px;color:var(--muted2);font-style:italic;">No players yet...</p>';
 }
 
 function renderBuzz(){
-  const rk=['1ST','2ND','3RD'],rc=['r1','r2','r3'];
+  var rk=['1ST','2ND','3RD'],rc=['r1','r2','r3'];
   document.getElementById('bzlist').innerHTML=buzzOrder.length
-    ?buzzOrder.map(function(b,i){return '<div class="bzi"><span class="bzr '+rc[i]+'">'+rk[i]+'</span>'+avEl(b.name,b.id,36)+'<div style="font-size:15px;font-weight:600;">'+b.name+'</div></div>';}).join('')
+    ?buzzOrder.map(function(b,i){return '<div class="bzi"><span class="bzr '+rc[i]+'">'+rk[i]+'</span>'+avEl(b.name,b.id,34)+'<div style="font-size:14px;font-weight:600;margin-left:2px;">'+b.name+'</div></div>';}).join('')
     :'<div class="bze">Waiting for buzzes...</div>';
 }
 
-function clearBuzz(){
-  buzzOrder=[];
-  renderBuzz();
-  channel.publish('state',{gameStarted,q:curQ,phase:'question',cleared:true});
+function clearBuzzOnly(){
+  buzzOrder=[];renderBuzz();
 }
 
 function launchGame(){
@@ -259,38 +288,112 @@ function launchGame(){
 }
 
 function loadQ(){
-  const q=Q[curQ];
+  answered=false;buzzOrder=[];
+  var q=Q[curQ];
   document.getElementById('qlbl').textContent='Q '+(curQ+1)+' / '+Q.length;
   document.getElementById('pgf').style.width=(((curQ+1)/Q.length)*100)+'%';
-  document.getElementById('qnum').textContent='QUESTION '+(curQ+1);
+  document.getElementById('qnum').textContent='QUESTION '+(curQ+1)+' OF '+Q.length;
   document.getElementById('qtxt').textContent=q.q;
-  const hint=document.getElementById('qhint');
-  if(q.hint){hint.textContent=q.hint;hint.style.display='inline-block';}
-  else{hint.style.display='none';}
-  document.getElementById('bnxt').textContent=curQ<Q.length-1?'NEXT QUESTION →':'FINISH GAME →';
-  document.getElementById('bprev').style.display=curQ>0?'inline-block':'none';
-  buzzOrder=[];
+  document.getElementById('result-badge-wrap').innerHTML='';
+
+  var letters=['A','B','C','D'];
+  document.getElementById('choices').innerHTML=q.c.map(function(c,i){
+    return '<button class="ch" id="ch'+i+'" onclick="markAnswer('+i+')"><span class="chl">'+letters[i]+'</span><span>'+c+'</span></button>';
+  }).join('');
+
+  document.getElementById('btn-reveal').style.display='inline-block';
+  document.getElementById('btn-clear').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  document.getElementById('btn-next').textContent=curQ<Q.length-1?'NEXT →':'SEE RESULTS →';
+
   renderBuzz();
   broadcastState();
 }
 
-function nextQuestion(){
+function markAnswer(idx){
+  var q=Q[curQ];
+  var correct=idx===q.ans;
+  var buzz1=buzzOrder.length?buzzOrder[0]:null;
+  var badge=document.getElementById('result-badge-wrap');
+
+  if(correct){
+    answered=true;
+    for(var i=0;i<4;i++){document.getElementById('ch'+i).disabled=true;}
+    document.getElementById('ch'+idx).classList.add('correct');
+    badge.innerHTML='<div class="result-badge correct">✅ CORRECT!'+(buzz1?' — '+buzz1.name+' gets a point!':'')+'</div>';
+    if(buzz1){scores[buzz1.id]=(scores[buzz1.id]||0)+10;renderPlayers();}
+    broadcastState({phase:'correct',ans:q.ans});
+    document.getElementById('btn-reveal').style.display='none';
+    document.getElementById('btn-clear').style.display='none';
+    document.getElementById('btn-next').style.display='inline-block';
+  }else{
+    // Wrong — only mark clicked as red, do NOT reveal correct answer
+    document.getElementById('ch'+idx).disabled=true;
+    document.getElementById('ch'+idx).classList.add('wrong');
+    badge.innerHTML='<div class="result-badge wrong">❌ WRONG! Next buzz or reveal answer.</div>';
+    broadcastState({phase:'wrong',ansIdx:idx});
+    // Keep reveal and next visible, allow more buzzes
+    document.getElementById('btn-reveal').style.display='inline-block';
+    document.getElementById('btn-clear').style.display='inline-block';
+    document.getElementById('btn-next').style.display='inline-block';
+  }
+}
+
+function revealAnswer(){
+  answered=true;
+  var q=Q[curQ];
+  for(var i=0;i<4;i++){
+    var btn=document.getElementById('ch'+i);
+    btn.disabled=true;
+    if(i===q.ans)btn.classList.add('correct');
+  }
+  document.getElementById('result-badge-wrap').innerHTML='<div class="result-badge correct">✅ Answer: '+['A','B','C','D'][q.ans]+' — '+q.c[q.ans]+'</div>';
+  document.getElementById('btn-reveal').style.display='none';
+  document.getElementById('btn-clear').style.display='inline-block';
+  document.getElementById('btn-next').style.display='inline-block';
+  broadcastState({phase:'reveal',ans:q.ans});
+}
+
+function clearBuzzAndReset(){
+  answered=false;buzzOrder=[];
+  document.getElementById('result-badge-wrap').innerHTML='';
+  var letters=['A','B','C','D'];
+  var q=Q[curQ];
+  document.getElementById('choices').innerHTML=q.c.map(function(c,i){
+    return '<button class="ch" id="ch'+i+'" onclick="markAnswer('+i+')"><span class="chl">'+letters[i]+'</span><span>'+c+'</span></button>';
+  }).join('');
+  document.getElementById('btn-reveal').style.display='inline-block';
+  document.getElementById('btn-clear').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  renderBuzz();
+  broadcastState();
+}
+
+function nextQ(){
   curQ++;
   if(curQ>=Q.length)showResults();
   else loadQ();
 }
 
-function prevQ(){
-  if(curQ>0){curQ--;loadQ();}
-}
-
 function showResults(){
   showScreen('results');
   channel.publish('state',{gameStarted:true,phase:'done'});
-  const sorted=Object.entries(players);
+  var sorted=Object.entries(scores).sort(function(a,b){return b[1]-a[1];});
+  var max=sorted.length?sorted[0][1]:1;
+  var medals=['🥇','🥈','🥉'];
   document.getElementById('final-wrap').innerHTML=sorted.length
-    ?sorted.map(function(e,i){const id=e[0],name=e[1];const c=AC[gci(id)];return '<div class="final-row"><span class="fr-rank">'+(i+1)+'</span><div class="fr-av" style="background:'+c.bg+';color:'+c.color+'">'+ini(name)+'</div><span class="fr-name">'+name+'</span><span style="font-size:13px;color:var(--muted)">Thanks for playing! 🎉</span></div>';}).join('')
-    :'<p style="color:var(--muted)">No players recorded.</p>';
+    ?sorted.map(function(e,i){
+        var id=e[0],pts=e[1],name=players[id]||id,c=AC[gci(id)];
+        var pct=max>0?Math.round((pts/max)*100):0;
+        return '<div class="final-row">'
+          +'<span class="fr-rank">'+(medals[i]||i+1)+'</span>'
+          +'<div class="fr-av" style="background:'+c.bg+';color:'+c.color+'">'+ini(name)+'</div>'
+          +'<span class="fr-name">'+name+'</span>'
+          +'<div class="fr-bw"><div class="fr-b" style="width:'+pct+'%"></div></div>'
+          +'<span class="fr-pts">'+pts+'</span>'
+          +'</div>';
+      }).join('')
+    :'<p style="color:var(--muted);text-align:center;">No scores recorded.</p>';
 }
 </script>
 </body>
