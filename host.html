@@ -257,6 +257,8 @@ function renderBuzz(){
 function launchGame(){
   gameStarted=true;
   showScreen('game');
+  // Broadcast state every 2s so late joiners always get current state
+  setInterval(()=>{ if(gameStarted) broadcastState(); }, 2000);
   broadcastState();
   loadQ();
 }

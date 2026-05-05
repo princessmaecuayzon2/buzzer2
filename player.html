@@ -145,19 +145,27 @@ async function joinSession(){
   await new Promise(r=>ably.connection.once('connected',r));
   channel=ably.channels.get(`buzzer-${sessionId}`);
 
+  let lastPhase='', lastQ=-1;
   // Listen for host state broadcasts
   channel.subscribe('state',data=>{
     if(!data.gameStarted)return;
-    if(data.phase==='done'){showScreen('sdone');return;}
+    if(data.phase==='done'){showScreen('sdone');clearInterval(timerIv);return;}
     if(data.phase==='reveal'){
-      curQ=data.q;
-      document.getElementById('rans').textContent=`✅ ${data.ansText||Q[data.q].c[data.ans]}`;
-      showScreen('sreveal');
+      // Only update if same question
+      if(lastPhase!=='reveal'||lastQ!==data.q){
+        lastPhase='reveal';lastQ=data.q;curQ=data.q;
+        document.getElementById('rans').textContent=`✅ ${data.ansText||Q[data.q].c[data.ans]}`;
+        clearInterval(timerIv);
+        showScreen('sreveal');
+      }
       return;
     }
     if(data.phase==='question'){
-      curQ=data.q;
-      loadBuzzScreen();
+      // Only load if new question
+      if(lastQ!==data.q||lastPhase!=='question'){
+        lastPhase='question';lastQ=data.q;curQ=data.q;
+        loadBuzzScreen();
+      }
     }
   });
 
