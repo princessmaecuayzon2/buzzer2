@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Player — PH History Buzzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+<style>
+:root{--bg:#080810;--surface:#12121e;--surface2:#1a1a2a;--accent:#f5c842;--green:#3ecf72;--red:#e8503a;--text:#eeeef0;--muted:#666;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow:hidden;}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:420px;text-align:center;}
+.screen.active{display:flex;}
+
+.logo{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;line-height:1;}
+.logo span{color:var(--accent);}
+.sub{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px;margin-bottom:2.5rem;}
+.jcard{background:var(--surface);border:0.5px solid var(--border2);border-radius:20px;padding:1.75rem;width:100%;}
+.lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block;text-align:left;}
+.inp{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-family:'Sora',sans-serif;font-size:16px;padding:13px 16px;outline:none;transition:border-color 0.15s;margin-bottom:1rem;}
+.inp:focus{border-color:var(--accent);}
+.sdisp{background:var(--surface2);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--muted);text-align:left;margin-bottom:1.25rem;}
+.sdisp strong{color:var(--accent);}
+.bjoin{width:100%;background:var(--accent);color:#111;border:none;border-radius:12px;padding:15px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;transition:opacity 0.15s;}
+.bjoin:hover{opacity:0.9;}
+.bjoin:disabled{opacity:0.4;cursor:not-allowed;}
+
+.wait-icon{font-size:56px;margin-bottom:1rem;animation:bob 2s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.wt{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin-bottom:8px;}
+.ws{font-size:14px;color:var(--muted);line-height:1.6;}
+.pbadge{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:0.5px solid var(--border2);border-radius:99px;padding:8px 18px 8px 8px;margin-top:1.5rem;}
+.pav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+
+#sbuzz{background:radial-gradient(ellipse at 50% 50%,#1a1530 0%,#080810 65%);min-height:100vh;position:fixed;top:0;left:0;right:0;bottom:0;}
+.bqn{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;}
+.tbig{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--accent);line-height:1;margin-bottom:2rem;}
+.tbig.urgent{color:var(--red);animation:urg 0.5s infinite;}
+@keyframes urg{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.bbtn{width:190px;height:190px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe066,#f5c842 50%,#c99a1a);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 0 0 rgba(245,200,66,0.4),0 8px 32px rgba(0,0,0,0.5);transition:transform 0.1s;animation:glow 3s ease-in-out infinite;user-select:none;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(245,200,66,0.3),0 8px 32px rgba(0,0,0,0.5)}50%{box-shadow:0 0 0 20px rgba(245,200,66,0.08),0 8px 40px rgba(245,200,66,0.2)}}
+.bbtn:active{transform:scale(0.92);}
+.bbtn:disabled{cursor:not-allowed;filter:grayscale(0.6);opacity:0.5;animation:none;}
+.bell{font-size:52px;}
+.blbl{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#111;}
+.bres{font-size:14px;line-height:1.6;margin-top:1.5rem;}
+
+#sreveal{min-height:100vh;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);}
+.rlbl{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;}
+.rbig{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;color:var(--green);animation:pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);}
+@keyframes pop{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+.rans{font-size:16px;font-weight:500;color:var(--text);margin:12px 0 8px;line-height:1.4;}
+.rhint{font-size:13px;color:var(--muted);}
+
+#sdone{min-height:100vh;}
+.dicon{font-size:72px;margin-bottom:1rem;}
+.dtitle{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;margin-bottom:8px;}
+.dsub{font-size:14px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="sjoin">
+  <div class="logo">🇵🇭<br><span>BUZZER</span></div>
+  <p class="sub">Sprint Retro · PH History</p>
+  <div class="jcard">
+    <label class="lbl">Your name</label>
+    <input class="inp" id="ninp" placeholder="Enter your name..." maxlength="20" onkeydown="if(event.key==='Enter')joinSession()">
+    <div class="sdisp">Session: <strong id="sdname">loading...</strong></div>
+    <button class="bjoin" id="bjoin" onclick="joinSession()">JOIN GAME</button>
+  </div>
+</div>
+
+<div class="screen" id="swait">
+  <div class="wait-icon">⏳</div>
+  <div class="wt">You're in!</div>
+  <p class="ws">Waiting for the host<br>to start the game...</p>
+  <div class="pbadge">
+    <div class="pav" id="wav"></div>
+    <span id="wnm"></span>
+  </div>
+</div>
+
+<div class="screen" id="sbuzz">
+  <div class="bqn" id="bqn">Question 1 of 10</div>
+  <div class="tbig" id="tbig">15</div>
+  <button class="bbtn" id="bbtn" onclick="doBuzz()">
+    <span class="bell">🔔</span>
+    <span class="blbl">BUZZ!</span>
+  </button>
+  <div class="bres" id="bres"></div>
+</div>
+
+<div class="screen" id="sreveal">
+  <div class="rlbl">Answer Revealed!</div>
+  <div class="rbig">CORRECT ANSWER</div>
+  <div class="rans" id="rans"></div>
+  <div class="rhint">Waiting for next question...</div>
+</div>
+
+<div class="screen" id="sdone">
+  <div class="dicon">🏁</div>
+  <div class="dtitle">GAME OVER!</div>
+  <p class="dsub">Thanks for playing!<br>Check the host screen for results 🏆</p>
+</div>
+
+<script>
+const ABLY_KEY='MMHXMA.LyX_CA:vmk1bi-kBXtY7hQb_JIsflNO5dIdf_lutEhLBaO6C0g';
+const AC=[{bg:'#1e1535',color:'#a78bfa'},{bg:'#0f2318',color:'#4ade80'},{bg:'#2a1010',color:'#f87171'},{bg:'#0e1d2e',color:'#60a5fa'},{bg:'#2a2208',color:'#fbbf24'},{bg:'#2a0e20',color:'#f472b6'},{bg:'#082a25',color:'#34d399'},{bg:'#1e2a08',color:'#a3e635'}];
+const Q=[
+  {q:"Sino ang itinuturing na 'Ama ng Rebolusyong Pilipino'?",c:["Jose Rizal","Andres Bonifacio","Apolinario Mabini","Emilio Aguinaldo"],ans:1},
+  {q:"Noong ilang taon dumating si Ferdinand Magellan sa Pilipinas?",c:["1521","1565","1543","1498"],ans:0},
+  {q:"Ilang bituin ang nasa watawat ng Pilipinas?",c:["2","3","4","8"],ans:1},
+  {q:"Sino ang bayaning Pilipino na pumatay kay Magellan?",c:["Tupas","Humabon","Lapu-Lapu","Soliman"],ans:2},
+  {q:"Kailan nakamit ng Pilipinas ang kalayaan mula sa Estados Unidos?",c:["Hunyo 12, 1898","Hulyo 4, 1946","Marso 17, 1935","Agosto 21, 1983"],ans:1},
+  {q:"Anong taon ang EDSA People Power Revolution?",c:["1972","1983","1986","1989"],ans:2},
+  {q:"Ano ang pinakamataas na bundok sa Pilipinas?",c:["Bundok Mayon","Bundok Pulag","Bundok Pinatubo","Bundok Apo"],ans:3},
+  {q:"Kanino pinangalanan ang Pilipinas?",c:["Haring Felipe I","Haring Felipe II","Ferdinand Magellan","Papa Alexander VI"],ans:1},
+  {q:"Anong nobela ni Rizal ang nagbigay-inspirasyon sa rebolusyon?",c:["El Filibusterismo","Noli Me Tangere","Florante at Laura","Ibong Adarna"],ans:1},
+  {q:"Ano ang pambansang wika ng Pilipinas?",c:["Tagalog","Pilipino","Filipino","Cebuano"],ans:2},
+];
+
+const params=new URLSearchParams(location.search);
+const sessionId=params.get('session')||'sprint86';
+document.getElementById('sdname').textContent=sessionId;
+
+let ably,channel;
+let myId='p_'+Math.random().toString(36).slice(2,9);
+let myName='',myCI=Math.floor(Math.random()*8);
+let buzzed=false,curQ=0,timeLeft=15,timerIv=null;
+
+const ini=n=>n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+const showScreen=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');};
+
+async function joinSession(){
+  const name=document.getElementById('ninp').value.trim();
+  if(!name)return;
+  myName=name;
+  const btn=document.getElementById('bjoin');
+  btn.disabled=true;btn.textContent='CONNECTING...';
+
+  ably=new Ably.Realtime(ABLY_KEY);
+  await new Promise(r=>ably.connection.once('connected',r));
+  channel=ably.channels.get(`buzzer-${sessionId}`);
+
+  // Listen for host state broadcasts
+  channel.subscribe('state',data=>{
+    if(!data.gameStarted)return;
+    if(data.phase==='done'){showScreen('sdone');return;}
+    if(data.phase==='reveal'){
+      curQ=data.q;
+      document.getElementById('rans').textContent=`✅ ${data.ansText||Q[data.q].c[data.ans]}`;
+      showScreen('sreveal');
+      return;
+    }
+    if(data.phase==='question'){
+      curQ=data.q;
+      loadBuzzScreen();
+    }
+  });
+
+  // Tell host I joined
+  await channel.publish('join',{id:myId,name:myName});
+
+  // Setup wait avatar
+  const c=AC[myCI];
+  const av=document.getElementById('wav');
+  av.style.background=c.bg;av.style.color=c.color;av.textContent=ini(name);
+  document.getElementById('wnm').textContent=name;
+  showScreen('swait');
+}
+
+function loadBuzzScreen(){
+  buzzed=false;timeLeft=15;
+  document.getElementById('bqn').textContent=`Question ${curQ+1} of ${Q.length}`;
+  document.getElementById('bres').innerHTML='';
+  document.getElementById('bbtn').disabled=false;
+  const t=document.getElementById('tbig');
+  t.textContent=15;t.className='tbig';
+  clearInterval(timerIv);
+  timerIv=setInterval(()=>{
+    timeLeft--;t.textContent=timeLeft;
+    if(timeLeft<=5)t.className='tbig urgent';
+    if(timeLeft<=0){clearInterval(timerIv);if(!buzzed){document.getElementById('bbtn').disabled=true;document.getElementById('bres').innerHTML='<span style="color:var(--muted)">Time\'s up! 😅</span>';}}
+  },1000);
+  showScreen('sbuzz');
+}
+
+function doBuzz(){
+  if(buzzed)return;
+  buzzed=true;
+  clearInterval(timerIv);
+  const elapsed=15-timeLeft;
+  channel.publish('buzz',{id:myId,name:myName,time:elapsed});
+  document.getElementById('bbtn').disabled=true;
+  document.getElementById('bres').innerHTML=`
+    <div style="animation:pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275)">
+      <div style="font-size:40px">🔔</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);letter-spacing:2px;margin-top:8px;">BUZZED!</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;">Wait for the host to call you! 🎤</div>
+    </div>`;
+}
+</script>
+</body>
+</html>
